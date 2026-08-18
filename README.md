@@ -1,79 +1,154 @@
-# EDGE TTS GUI
+# 🗣️ TTS VoiceTxt — Linux TTS Application
 
-![Screenshot](https://i.ibb.co/R9CDMLn/edge-tts-gui.png)
+> Una aplicación de escritorio moderna para convertir texto a voz, diseñada específicamente para Linux y preparada para su distribución mediante Flatpak.
 
-EDGE TTS GUI is a graphical user interface (GUI) application built with [CustomTkinter](https://github.com/tomschimansky/customtkinter) that utilizes the `edge-tts` library to convert text to speech using Microsoft's online text-to-speech service. This application allows users to input text, select a voice, and adjust speech parameters such as rate, pitch, and volume. It also provides options to preview the generated speech and save it as an audio file.
+---
 
-## Features
+Este proyecto es una **reescritura completa y un rediseño arquitectónico** basado en el trabajo inicial de [schr-0dinger/edge_tts_gui](https://github.com/schr-0dinger/edge_tts_gui).
 
-- **Voice Selection:** Choose from a wide range of available voices.
-- **Adjustable Parameters:** Customize the rate, pitch, and volume of the speech.
-- **Preview:** Listen to the generated speech before saving.
-- **Save Options:** Save the generated speech with different naming conventions.
-- **Internet Connectivity Check:** Ensures that the application is connected to the internet before performing any text-to-speech operations.
+Agradecemos enormemente a **schr-0dinger** por la idea original y el punto de partida que motivó esta nueva versión.
 
-## Installation
+---
 
-#### Method 1 (Windows Executable):
+## 🚀 Motivo de la reescritura
 
-1. **Download the Standalone Executable:**
-    - Go to the [Releases](https://github.com/schr-0dinger/edge_tts_gui/releases) page.
-    - Download the latest version of `edge_tts_gui.exe`.
+Aunque la aplicación original era funcional, presentaba problemas de arquitectura que causaban **bloqueos en la interfaz (freezing)** durante la generación de audio, y su estructura monolítica dificultaba su mantenimiento y empaquetado para Linux.
 
-2. **Run the Application:**
-    - Double-click the downloaded `edge_tts_gui.exe` file to start the application.
+Esta nueva versión soluciona esos problemas e introduce una **arquitectura modular desde cero**.
 
+---
 
-#### Method 2:
+## ✨ Características principales
 
-###### Prerequisites:
+| Característica                    | Descripción                                                                                                        |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| **🖥️ Interfaz Qt6/PySide6**      | Integración nativa con escritorios Linux modernos (como KDE Plasma).                                               |
+| **⚡ Cero bloqueos**               | Uso de `QThread` y señales asíncronas para mantener la interfaz siempre responsiva.                                |
+| **🧩 Arquitectura de Motores**    | Abstracción del motor TTS (`BaseTTSEngine`) que permite añadir futuros motores locales sin reescribir la interfaz. |
+| **🎙️ Gestión de Voces Mejorada** | Filtrado por idioma, región y género de forma dinámica.                                                            |
+| **📂 Importar y Exportar**        | Soporte para importar archivos `.txt` y guardar el audio generado en MP3.                                          |
+| **📦 Preparado para Flatpak**     | Estructura de directorios y configuración pensada para cumplir con los estándares XDG de Linux.                    |
+| **🎮 Detección de Hardware**      | Preparación para identificar GPUs (AMD/NVIDIA) para futuras aceleraciones de modelos locales.                      |
 
-- Python 3.x
-- Dependencies
+---
 
-0. Install dependencies:
+## 🏗️ Arquitectura
 
-        pip install edge-tts CTkMessageBox customtkinter pydub
-    
+El proyecto se divide en **capas estrictamente separadas**:
 
-1. ** Clone the repo **
+```text
+┌──────────────────────────────┐
+│       GUI (PySide6)          │
+└──────────────┬───────────────┘
+               ↓
+┌──────────────────────────────┐
+│          Controller          │
+└──────────────┬───────────────┘
+               ↓
+┌──────────────────────────────┐
+│   TTS Worker                 │
+│   QThread + asyncio          │
+└──────────────┬───────────────┘
+               ↓
+┌──────────────────────────────┐
+│         TTS Engine           │
+│ Edge TTS / Futuros motores   │
+│           locales            │
+└──────────────┬───────────────┘
+               ↓
+┌──────────────────────────────┐
+│       Audio Player           │
+│        QtMultimedia          │
+└──────────────────────────────┘
+```
 
-        git clone https://github.com/schr-0dinger/edge_tts_gui.git
+---
 
-2. ** Run edge_tts_gui.py ** 
+## 🛠️ Instalación — Modo Desarrollo
 
-        python edge_tts_gui.py
-    
+Actualmente, la aplicación está en **fase de desarrollo activo**.
 
-## Usage
+Para ejecutarla en tu máquina Linux:
 
-1. **Interface Overview:**
-    - **Text Input:** Enter the text you want to convert to speech.
-    - **Voice Selection:** Select a voice from the dropdown menu.
-    - **Adjust Parameters:** Use the sliders to adjust rate, pitch, and volume.
-    - **Generate:** Click the "GENERATE" button to save the speech as an audio file.
-    - **Preview:** Click the "PREVIEW" button to listen to the speech before saving.
-    - **Save Options:** Choose how you want to name the output file.
+### 1. Clona el repositorio
 
-## To-do List
+```bash
+git clone https://github.com/danny123uwu/edge_tts_gui_VoiceTxt.git
 
-- ~~Add option to switch between MP3/WAV format~~
-- Fix faulty preview function
-- Fix 0-100 volume slider
+cd edge_tts_gui_VoiceTxt
+```
 
-## Dependencies
+### 2. Crea un entorno virtual y actívalo
 
-All necessary dependencies are bundled within the standalone executable, so you don't need to install anything else if you using the executable.
+```bash
+python -m venv venv
 
-## Project Description
+source venv/bin/activate
+```
 
-This project is essentially a GUI version of the `edge-tts` library, which allows users to use Microsoft Edge's online text-to-speech service from Python WITHOUT needing Microsoft Edge, Windows, or an API key.
+> En `fish`:
+>
+> ```fish
+> source venv/bin/activate.fish
+> ```
 
-## Contributing
+### 3. Instala las dependencias
 
-Contributions are welcome! Please open an issue or submit a pull request if you have any improvements or bug fixes.
-      
-## Acknowledgements
+```bash
+pip install PySide6 edge-tts
+```
 
-Special thanks to the developers of the `edge-tts` library for making this project possible.
+### 4. Ejecuta la aplicación
 
+```bash
+python main.py
+```
+
+---
+
+## 🗺️ Hoja de ruta — Roadmap
+
+### 🔹 Fase 1–3
+
+* Análisis
+* Arquitectura
+* Core TTS (Edge TTS)
+
+### 🔹 Fase 4–6
+
+* GUI en PySide6
+* Concurrencia
+* Reproductor de Audio
+
+### 🔹 Fase 7.1
+
+* Mejora en UI
+* Importar TXT
+* Filtrado de voces
+
+### 🔹 Fase 7.2
+
+* Persistencia de configuración
+* XDG dirs
+
+### 🔹 Fase 8
+
+* Detección de Hardware
+* CPU/GPU
+
+### 🔹 Fase 10
+
+* Integración de Motores TTS Locales
+* Modelos
+
+### 🔹 Fase 12
+
+* Empaquetado definitivo en Flatpak
+
+---
+
+<div align="center">
+
+**TTS VoiceTxt — Linux TTS Application**
+
+</div>
