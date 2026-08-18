@@ -1,9 +1,48 @@
+# === Archivos del proyecto antiguo (legacy) ===
 gui.py
 gui.spec
 modern.spec
-build/
-dist/
 edge
 EDGE\ TTS\ GUI\ 0.1-alpha.spec
+
+# === Audio Generado ===
 *.MP3
 *.WAV
+*.mp3
+*.wav
+
+# === Python (Caché y paquetes compilados) ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# === Entornos Virtuales ===
+Audios/
+venv/
+env/
+.venv/
+env.bak/
+venv.bak/
+
+# === Empaquetado y Distribución ===
+build/
+dist/
+*.egg-info/
+*.egg
+
+# === Flatpak ===
+.flatpak-builder/
+repo/
+.flatpak/
+build-dir/
+
+# === Logs y archivos temporales ===
+*.log
+*.tmp
+
+# === IDEs y Sistema Operativo ===
+.vscode/
+.idea/
+*.swp
+.DS_Store
